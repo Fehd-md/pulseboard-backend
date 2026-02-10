@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum CardType {
+  task
+  note
+  goal
+}
+
+enum CardStatus {
+  todo
+  doing
+  done
+}
+
+model Card {
+  id        Int        @id @default(autoincrement())
+  title     String
+  content   String?
+  type      CardType   @default(task)
+  status    CardStatus @default(todo)
+  tags      String     @default("[]") // JSON array string
+  dueDate   DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
