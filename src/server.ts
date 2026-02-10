@@ -5,6 +5,16 @@ import env from "@fastify/env";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 
+declare module "fastify" {
+  interface FastifyInstance {
+    config: {
+      PORT: string;
+      CORS_ORIGIN: string;
+    };
+  }
+}
+
+
 const prisma = new PrismaClient();
 
 const fastify = Fastify({ logger: true });
@@ -131,13 +141,18 @@ fastify.patch("/cards/:id", async (req) => {
   const updated = await prisma.card.update({
     where: { id: Number(params.id) },
     data: {
-      title: body.title,
-      content: body.content ?? undefined,
-      type: body.type,
-      status: body.status,
-      tags: body.tags ? safeJsonArrayString(body.tags) : undefined,
-      dueDate: body.dueDate === undefined ? undefined : body.dueDate ? new Date(body.dueDate) : null
+      ...(body.title !== undefined && { title: body.title }),
+      ...(body.content !== undefined && { content: body.content }),
+      ...(body.type !== undefined && { type: body.type }),
+      ...(body.status !== undefined && { status: body.status }),
+      ...(body.tags !== undefined && {
+        tags: safeJsonArrayString(body.tags)
+      }),
+      ...(body.dueDate !== undefined && {
+        dueDate: body.dueDate ? new Date(body.dueDate) : null
+      })
     }
+
   });
 
   return {
