@@ -19,4 +19,4 @@ COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/dist ./dist
 RUN mkdir -p data
 EXPOSE 4000
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start:docker"]
